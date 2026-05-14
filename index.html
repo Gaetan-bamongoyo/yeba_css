@@ -47,6 +47,10 @@
 
             <div class="game-content">
                 <div class="level-title">Level 1: Position Items</div>
+                <div class="level-meta">
+                    <span class="level-difficulty">Debutant</span>
+                    <span class="level-progress">1 / 1</span>
+                </div>
                 
                 <div class="game-area">
                     <div class="grid-bg"></div>
@@ -77,6 +81,7 @@
             <div class="level-explication">
                 <p><strong>Objectif :</strong> Utilisez les propriétés <code class="inline-code">justify-content</code> et <code class="inline-code">align-items</code> pour déplacer le carré sur la cible.</p>
             </div>
+            <p class="level-feedback" aria-live="polite"></p>
 
             <div class="editor-content">
                 <div class="code-block">
@@ -90,49 +95,8 @@
     <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-    <script>
-        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-            mode: "css",
-            lineNumbers: true,
-            theme: "default"
-        });
-        
-        // Initial value
-        editor.setValue("#container {\n  display: flex; \n}");
-
-        // Function to apply CSS
-        function applyCSS() {
-            var css = editor.getValue();
-            document.getElementById('dynamic-styles').innerHTML = css;
-            
-            // Check for success after layout recalculation
-            setTimeout(checkWin, 50);
-        }
-
-        function checkWin() {
-            var item = document.querySelector('.item');
-            var target = document.querySelector('.target');
-            
-            if (!item || !target) return;
-            
-            var itemRect = item.getBoundingClientRect();
-            var targetRect = target.getBoundingClientRect();
-            
-            // Check if positions match closely (e.g. within 2px)
-            if (Math.abs(itemRect.top - targetRect.top) < 2 && Math.abs(itemRect.left - targetRect.left) < 2) {
-                item.classList.add('success');
-            } else {
-                item.classList.remove('success');
-            }
-        }
-
-        // Apply on change and on load
-        editor.on('change', applyCSS);
-        applyCSS();
-        
-        // Optional: click validate button to apply (if they prefer manual validation)
-        document.querySelector('.validate-btn').addEventListener('click', applyCSS);
-    </script>
+    <script src="js/levels.js"></script>
+    <script src="js/script.js"></script>
 </body>
 
 </html>
