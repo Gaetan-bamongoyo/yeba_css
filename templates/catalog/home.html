@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nayekola — Apprendre en jouant{% endblock %}
+
+{% block body_class %}page-home{% endblock %}
+
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<main class="home">
+    <section class="home-hero" aria-labelledby="home-brand">
+        <div class="home-hero-visual" aria-hidden="true">
+            <div class="home-hero-glow"></div>
+            <div class="home-hero-board">
+                <span class="home-float-square home-float-square--a"></span>
+                <span class="home-float-square home-float-square--b"></span>
+                <span class="home-float-square home-float-square--c"></span>
+                <span class="home-float-target"></span>
+            </div>
+        </div>
+
+        <div class="home-hero-content">
+            <p id="home-brand" class="home-brand">Nayekola</p>
+            <h1 class="home-headline">Apprendre la programmation en jouant</h1>
+            <p class="home-lead">
+                Des situations concrètes pour progresser pas à pas, en commençant par CSS.
+            </p>
+            <div class="home-cta-group">
+                <a class="home-cta home-cta--primary" href="#situations">Voir les situations</a>
+                <a class="home-cta home-cta--ghost" href="{% url 'game_play' 'css-flexbox' %}">Jouer maintenant</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="situations" class="home-situations" aria-labelledby="situations-title">
+        <div class="home-situations-inner">
+            <header class="home-situations-header">
+                <h2 id="situations-title">Nos situations</h2>
+                <p>Choisissez un jeu pour démarrer. Chaque parcours se charge en une fois.</p>
+            </header>
+
+            <div class="game-grid">
+                {% for game in games %}
+                {% with playable=game.level_count %}
+                {% if playable %}
+                <a class="game-card" href="{% url 'game_play' game.slug %}">
+                {% else %}
+                <article class="game-card game-card--soon" aria-label="{{ game.title }} — bientôt disponible">
+                {% endif %}
+                    <div class="game-card-media">
+                        {% if game.cover_image %}
+                        <img src="{{ game.cover_image.url }}" alt="Illustration {{ game.title }}" loading="lazy">
+                        {% else %}
+                        {% with cover_path=game.cover_static_path %}
+                        <img src="{% static cover_path %}" alt="Illustration {{ game.title }}" loading="lazy">
+                        {% endwith %}
+                        {% endif %}
+                        {% if playable %}
+                        <span class="game-card-badge">{{ playable }} niveaux</span>
+                        {% else %}
+                        <span class="game-card-badge game-card-badge--soon">Bientôt</span>
+                        {% endif %}
+                    </div>
+                    <div class="game-card-body">
+                        <h3>{{ game.title }}</h3>
+                        <p>{{ game.short_description }}</p>
+                        {% if playable %}
+                        <span class="game-card-action">Commencer →</span>
+                        {% else %}
+                        <span class="game-card-action game-card-action--soon">À venir</span>
+                        {% endif %}
+                    </div>
+                {% if playable %}
+                </a>
+                {% else %}
+                </article>
+                {% endif %}
+                {% endwith %}
+                {% empty %}
+                <p class="game-empty">
+                    Aucun jeu disponible pour le moment.
+                    Lancez <code>python manage.py seed_flexbox</code>.
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

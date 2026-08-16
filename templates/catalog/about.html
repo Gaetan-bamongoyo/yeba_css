@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}À propos — Nayekola{% endblock %}
+
+{% block body_class %}page-about{% endblock %}
+
+{% block content %}
+<main class="about-page">
+    <section class="about-hero" aria-labelledby="about-title">
+        <div class="about-hero-inner">
+            <div class="about-hero-copy">
+                <p class="about-eyebrow">Notre histoire</p>
+                <h1 id="about-title">Apprendre en jouant,&nbsp;pas en subissant</h1>
+                <p class="about-hero-text">
+                    Nayekola est née d’une idée simple : rendre la programmation accessible
+                    aux débutants à travers des missions concrètes. Chaque situation est un
+                    défi ludique pour progresser vraiment.
+                </p>
+                <a class="about-cta" href="{% url 'home' %}#situations">Découvrir les situations</a>
+            </div>
+            <div class="about-hero-panel" aria-hidden="true">
+                <div class="about-hero-stat">
+                    <strong>21</strong>
+                    <span>étapes CSS</span>
+                </div>
+                <div class="about-hero-stat">
+                    <strong>3</strong>
+                    <span>situations</span>
+                </div>
+                <div class="about-hero-stat">
+                    <strong>1</strong>
+                    <span>mission : lancer</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-story">
+        <div class="about-story-inner">
+            <p class="about-eyebrow">La plateforme</p>
+            <h2>Nous vous invitons à rejoindre Nayekola</h2>
+            <p class="about-story-lead">
+                Conçue pour les débutants, Nayekola transforme les notions techniques en
+                parcours jouables. On commence par CSS Flexbox : tu ranges l’interface
+                avant le lancement. D’autres situations (Python, SQL) arriveront ensuite.
+            </p>
+
+            <div class="about-features">
+                <article class="about-feature">
+                    <span class="about-feature-icon" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </span>
+                    <h3>Apprentissage actif</h3>
+                    <p>Tu codes vraiment dans l’éditeur. Chaque réussite débloque l’étape suivante.</p>
+                </article>
+                <article class="about-feature">
+                    <span class="about-feature-icon" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </span>
+                    <h3>Peu de connexion</h3>
+                    <p>Une fois le jeu chargé, tu continues en local. La progression se synchronise plus tard.</p>
+                </article>
+                <article class="about-feature">
+                    <span class="about-feature-icon" aria-hidden="true">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </span>
+                    <h3>Pour les débutants</h3>
+                    <p>Des briefs clairs, des niveaux progressifs, et une mission qui donne du sens au CSS.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-journey" aria-labelledby="journey-title">
+        <div class="about-journey-inner">
+            <p class="about-eyebrow">Notre parcours</p>
+            <h2 id="journey-title">Une histoire en construction</h2>
+            <p class="about-journey-lead">
+                De la première idée à la plateforme que tu utilises aujourd’hui.
+            </p>
+
+            <ol class="about-timeline">
+                <li class="about-timeline-item">
+                    <span class="about-timeline-year">01</span>
+                    <div>
+                        <h3>L’idée Nayekola</h3>
+                        <p>Créer un espace où l’on apprend la programmation en jouant, sans jargon inutile.</p>
+                    </div>
+                </li>
+                <li class="about-timeline-item">
+                    <span class="about-timeline-year">02</span>
+                    <div>
+                        <h3>Première mission CSS</h3>
+                        <p>Lancer Nayekola : 21 étapes Flexbox pour mettre en forme l’interface avant l’ouverture.</p>
+                    </div>
+                </li>
+                <li class="about-timeline-item">
+                    <span class="about-timeline-year">03</span>
+                    <div>
+                        <h3>Nouvelles situations</h3>
+                        <p>Python et SQL arrivent bientôt, sur le même principe : une mission, des défis, du code.</p>
+                    </div>
+                </li>
+                <li class="about-timeline-item">
+                    <span class="about-timeline-year">04</span>
+                    <div>
+                        <h3>La suite</h3>
+                        <p>Comptes, plus de niveaux, et toujours le même objectif : apprendre en s’amusant.</p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="about-cta-band">
+        <div class="about-cta-band-inner">
+            <h2>Prêt à commencer ?</h2>
+            <p>Rejoins la mission CSS et aide à lancer Nayekola.</p>
+            <div class="about-cta-actions">
+                <a class="about-cta about-cta--light" href="{% url 'game_play' 'css-flexbox' %}">Jouer maintenant</a>
+                <a class="about-cta about-cta--ghost" href="{% url 'contact' %}">Nous contacter</a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

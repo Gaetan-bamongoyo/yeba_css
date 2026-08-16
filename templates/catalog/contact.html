@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Contact — Nayekola{% endblock %}
+
+{% block body_class %}page-contact{% endblock %}
+
+{% block content %}
+<main class="contact-page">
+    <section class="contact-hero" aria-labelledby="contact-title">
+        <p class="contact-eyebrow">Restons en contact</p>
+        <h1 id="contact-title">Contactez-nous</h1>
+        <p class="contact-hero-text">
+            Une question, un retour ou une idée de niveau ?
+            Nous serons ravis d’échanger avec vous.
+        </p>
+    </section>
+
+    <section class="contact-main">
+        <div class="contact-main-inner">
+            <aside class="contact-talk">
+                <h2>Parlons-en</h2>
+                <p class="contact-talk-lead">
+                    Nous répondons généralement sous 24&nbsp;h pendant les jours ouvrables.
+                </p>
+
+                <ul class="contact-info-list">
+                    <li class="contact-info-item">
+                        <span class="contact-info-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.68 2.35a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.75.32 1.54.55 2.35.68A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Téléphone</strong>
+                            <a href="tel:+243817675404">+243 817 675 404</a>
+                        </div>
+                    </li>
+                    <li class="contact-info-item">
+                        <span class="contact-info-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Email</strong>
+                            <a href="mailto:contact@nayekola.com">contact@nayekola.com</a>
+                        </div>
+                    </li>
+                    <li class="contact-info-item">
+                        <span class="contact-info-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Horaires</strong>
+                            <span>Lun – Ven : 9 h – 18 h</span>
+                        </div>
+                    </li>
+                    <li class="contact-info-item">
+                        <span class="contact-info-icon" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Plateforme</strong>
+                            <span>Nayekola — apprentissage en ligne</span>
+                        </div>
+                    </li>
+                </ul>
+            </aside>
+
+            <div class="contact-form-card">
+                {% if messages %}
+                <ul class="contact-messages">
+                    {% for message in messages %}
+                    <li class="contact-message {% if message.tags %}contact-message--{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <form method="post" class="contact-form" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="contact-form-errors">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <div class="contact-form-grid">
+                        <div class="contact-field">
+                            <label for="{{ form.name.id_for_label }}">{{ form.name.label }} *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<p class="contact-field-error">{{ form.name.errors|striptags }}</p>{% endif %}
+                        </div>
+
+                        <div class="contact-field">
+                            <label for="{{ form.email.id_for_label }}">{{ form.email.label }} *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<p class="contact-field-error">{{ form.email.errors|striptags }}</p>{% endif %}
+                        </div>
+
+                        <div class="contact-field">
+                            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<p class="contact-field-error">{{ form.phone.errors|striptags }}</p>{% endif %}
+                        </div>
+
+                        <div class="contact-field">
+                            <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }} *</label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}<p class="contact-field-error">{{ form.subject.errors|striptags }}</p>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="contact-field">
+                        <label for="{{ form.message.id_for_label }}">{{ form.message.label }} *</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}<p class="contact-field-error">{{ form.message.errors|striptags }}</p>{% endif %}
+                    </div>
+
+                    <button class="contact-submit" type="submit">Envoyer le message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
