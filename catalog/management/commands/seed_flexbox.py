@@ -29,10 +29,10 @@ class Command(BaseCommand):
             slug="css-flexbox",
             defaults={
                 "title": "CSS Flexbox",
-                "short_description": "Mission : préparer l'interface de Nayekola avant le lancement.",
+                "short_description": "Énigmes : réveille le site fantôme de Nayekola avec Flexbox.",
                 "description": (
-                    "La plateforme ouvre demain. Range chaque panneau de l'interface "
-                    "avec Flexbox : header, cartes, menus et catalogue. "
+                    "Le site est figé. Chaque énigme te demande de remettre un fragment "
+                    "d'interface à sa place grâce au CSS Flexbox. "
                     "Tout le parcours se charge en une fois."
                 ),
                 "is_active": True,
@@ -47,7 +47,9 @@ class Command(BaseCommand):
                 defaults={
                     "title": payload["title"],
                     "difficulty": payload["difficulty"],
+                    "scene": payload.get("scene", ""),
                     "objective": payload["objective"],
+                    "hint": payload.get("hint", ""),
                     "item_count": payload.get("item_count", 1),
                     "target_styles": payload["target_styles"],
                     "starter_code": payload["starter_code"],
@@ -58,7 +60,7 @@ class Command(BaseCommand):
         action = "créé" if created else "mis à jour"
         self.stdout.write(
             self.style.SUCCESS(
-                f"Jeu '{game.title}' {action} avec {len(FLEXBOX_LEVELS)} niveaux."
+                f"Jeu '{game.title}' {action} avec {len(FLEXBOX_LEVELS)} énigmes."
             )
         )
 

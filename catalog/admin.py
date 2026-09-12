@@ -10,9 +10,11 @@ class LevelInline(admin.TabularInline):
         "order",
         "title",
         "difficulty",
+        "scene",
         "item_count",
         "is_active",
         "objective",
+        "hint",
         "target_styles",
         "starter_code",
     )
@@ -37,6 +39,6 @@ class GameAdmin(admin.ModelAdmin):
 
 @admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
-    list_display = ("title", "game", "order", "difficulty", "item_count", "is_active")
+    list_display = ("title", "game", "order", "scene", "difficulty", "item_count", "is_active")
     list_filter = ("game", "difficulty", "is_active")
-    search_fields = ("title", "objective")
+    search_fields = ("title", "objective", "hint", "scene")

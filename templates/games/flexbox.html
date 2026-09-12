@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Mission : Lancer Nayekola — {{ game.title }}{% endblock %}
+{% block title %}Le site fantôme — {{ game.title }}{% endblock %}
 
-{% block body_class %}page-game{% endblock %}
+{% block body_class %}page-game page-enigma{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
 <style id="dynamic-styles"></style>
 {% endblock %}
 
@@ -15,18 +16,27 @@
 {{ levels_pack|json_script:"game-levels" }}
 {{ progress_pack|json_script:"game-progress" }}
 
-<section class="mission-brief" aria-labelledby="mission-title">
+<section class="mission-brief mission-brief--enigma" aria-labelledby="mission-title">
     <div class="mission-brief-inner">
-        <p class="mission-kicker">Mission CSS</p>
-        <h1 id="mission-title">Lancer Nayekola</h1>
+        <p class="mission-kicker">Protocole de réparation</p>
+        <h1 id="mission-title">Le site fantôme</h1>
         <p class="mission-brief-text">
-            La plateforme ouvre demain. Chaque étape, tu ranges un panneau de l'interface
-            pour que l'accueil, les cartes et les menus soient prêts.
+            Nayekola est figé. Chaque énigme rallume un fragment de l'interface.
+            Lis l'indice… mais la solution, c'est toi qui la codes.
         </p>
+        <div class="stability-meter" aria-label="Stabilité du site">
+            <div class="stability-meter-top">
+                <span>Stabilité du site</span>
+                <strong id="stability-value">0%</strong>
+            </div>
+            <div class="stability-track">
+                <div class="stability-fill" id="stability-fill"></div>
+            </div>
+        </div>
     </div>
 </section>
 
-<div class="app-wrapper"
+<div class="app-wrapper app-wrapper--enigma"
      id="game-root"
      data-game-slug="{{ game.slug }}"
      data-sync-url="{{ sync_url }}">
@@ -38,7 +48,8 @@
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </a>
-            <h2>Interface</h2>
+            <h2>Scène</h2>
+            <span class="scene-tag" id="scene-tag">—</span>
             <span class="sync-status" id="sync-status" aria-live="polite"></span>
         </header>
 
@@ -49,8 +60,9 @@
                 <span class="level-progress">0 / 0</span>
             </div>
 
-            <div class="game-area">
+            <div class="game-area game-area--enigma">
                 <div class="grid-bg"></div>
+                <div class="glitch-veil" aria-hidden="true"></div>
                 <div class="target-container">
                     <div class="target"></div>
                 </div>
@@ -70,20 +82,43 @@
                     <polyline points="8 6 2 12 8 18"></polyline>
                 </svg>
             </button>
-            <h2>Console CSS</h2>
+            <h2>Terminal CSS</h2>
             <div class="spacer"></div>
         </header>
-        <div class="level-explication">
-            <p><strong>Brief :</strong> …</p>
+
+        <div class="enigma-box">
+            <p class="enigma-label">Énigme</p>
+            <p class="enigma-text" id="enigma-text">…</p>
+            <button type="button" class="hint-btn" id="hint-btn">Révéler un indice</button>
+            <p class="hint-text is-hidden" id="hint-text" aria-live="polite"></p>
         </div>
+
         <p class="level-feedback" aria-live="polite"></p>
 
         <div class="editor-content">
             <div class="code-block">
-                <textarea id="code" placeholder="Écris le CSS de cette étape…"></textarea>
+                <textarea id="code" placeholder="Écris le CSS qui répare cette scène…"></textarea>
             </div>
-            <button class="validate-btn" type="button">VALIDER L'ÉTAPE</button>
+            <button class="validate-btn" type="button">RÉSOUDRE L'ÉNIGME</button>
         </div>
+    </div>
+</div>
+
+<div class="victory-modal is-hidden" id="victory-modal" role="dialog" aria-modal="true" aria-labelledby="victory-title" hidden>
+    <div class="victory-modal-backdrop" data-victory-close></div>
+    <div class="victory-modal-card">
+        <p class="victory-kicker">Protocole terminé</p>
+        <h2 id="victory-title">Bravo ! Nayekola est réveillé</h2>
+        <p class="victory-text">
+            Tu as résolu toutes les énigmes CSS. Le site n’est plus fantôme.
+            Que veux-tu faire maintenant ?
+        </p>
+        <div class="victory-actions">
+            <a class="victory-btn victory-btn--primary" href="{% url 'home' %}">Retour au menu</a>
+            <a class="victory-btn victory-btn--secondary" href="{% url 'home' %}#situations">Voir les autres jeux</a>
+            <button type="button" class="victory-btn victory-btn--ghost" id="victory-restart">Rejouer ce protocole</button>
+        </div>
+        <p class="victory-note">Python et SQL arrivent bientôt — reste connecté.</p>
     </div>
 </div>
 {% endblock %}
@@ -91,6 +126,8 @@
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-<script src="{% static 'js/games/flexbox/progress.js' %}"></script>
-<script src="{% static 'js/games/flexbox/engine.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/css-hint.min.js"></script>
+<script src="{% static 'js/games/flexbox/progress.js' %}?v=enigma5"></script>
+<script src="{% static 'js/games/flexbox/engine.js' %}?v=enigma5"></script>
 {% endblock %}

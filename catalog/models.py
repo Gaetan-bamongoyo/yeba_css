@@ -35,7 +35,9 @@ class Level(models.Model):
     order = models.PositiveIntegerField(default=0)
     title = models.CharField(max_length=160)
     difficulty = models.CharField(max_length=40, default="Debutant")
-    objective = models.TextField()
+    scene = models.CharField(max_length=80, blank=True, default="")
+    objective = models.TextField(help_text="Texte d'énigme affiché au joueur.")
+    hint = models.TextField(blank=True, help_text="Indice technique débloquable.")
     item_count = models.PositiveIntegerField(default=1)
     target_styles = models.JSONField(default=dict)
     starter_code = models.TextField(default="#container {\n  display: flex;\n}")
@@ -54,7 +56,9 @@ class Level(models.Model):
             "order": self.order,
             "title": self.title,
             "difficulty": self.difficulty,
+            "scene": self.scene,
             "objective": self.objective,
+            "hint": self.hint,
             "itemCount": self.item_count,
             "target": self.target_styles,
             "starterCode": self.starter_code,
