@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path
 
 from catalog import views
@@ -11,8 +12,14 @@ urlpatterns = [
     path("a-propos/", views.about, name="about"),
     path("contact/", views.contact, name="contact"),
     path("jeux/<slug:slug>/", views.game_play, name="game_play"),
+    path(
+        "jeux/<slug:slug>/mission/<slug:mission>/",
+        views.game_mission,
+        name="game_mission",
+    ),
     path("api/progress/<slug:slug>/", views.progress_sync, name="progress_sync"),
 ]
 
 if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

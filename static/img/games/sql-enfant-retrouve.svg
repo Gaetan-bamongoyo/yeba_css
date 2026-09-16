@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="L'enfant retrouvé">
+  <defs>
+    <linearGradient id="er-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f3d4c"/>
+      <stop offset="100%" stop-color="#1f6f7a"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#er-bg)"/>
+  <ellipse cx="320" cy="118" rx="130" ry="34" fill="#3db8c5" opacity="0.95"/>
+  <path d="M190 118 v70 c0 24 58 36 130 36 s130-12 130-36 v-70" fill="none" stroke="#9de4ea" stroke-width="14"/>
+  <circle cx="260" cy="248" r="34" fill="rgba(255,255,255,0.14)" stroke="#e8f5ed" stroke-width="3"/>
+  <circle cx="380" cy="240" r="46" fill="rgba(255,255,255,0.18)" stroke="#e8f5ed" stroke-width="3"/>
+  <path d="M260 282 v18 M380 286 v16" stroke="#e8f5ed" stroke-width="4" stroke-linecap="round"/>
+  <text x="48" y="360" fill="rgba(255,255,255,0.92)" font-family="Georgia, serif" font-size="22">SELECT parent FROM liens</text>
+</svg>

@@ -25,6 +25,14 @@ def get_or_create_progress(request, game):
 
 
 def merge_progress_payload(progress, payload, level_count):
+    # Rejouer : remplacer entièrement la progression (ne pas fusionner avec l'ancien état).
+    if payload.get("reset"):
+        progress.current_level = 0
+        progress.completed_levels = []
+        progress.is_finished = False
+        progress.save()
+        return progress
+
     current_level = int(payload.get("currentLevel", progress.current_level) or 0)
     completed = payload.get("completedLevels", progress.completed_levels) or []
     is_finished = bool(payload.get("isFinished", progress.is_finished))
@@ -44,7 +52,7 @@ def merge_progress_payload(progress, payload, level_count):
         if 0 <= index < max(level_count, 1) and index not in cleaned:
             cleaned.append(index)
 
-    # Keep the furthest progress (local or server).
+    # Keep the furthest progress (local or server), sauf reset explicite ci-dessus.
     if current_level < progress.current_level:
         current_level = progress.current_level
 

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Enquêtes SQL — {{ game.title }}{% endblock %}
+
+{% block body_class %}page-game page-sql page-sql-hub{% endblock %}
+
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<main class="sql-hub">
+    <section class="mission-brief mission-brief--sql" aria-labelledby="sql-hub-title">
+        <div class="mission-brief-inner">
+            <p class="mission-kicker">Bureau des enquêtes</p>
+            <h1 id="sql-hub-title">Enquêtes SQL</h1>
+            <p class="mission-brief-text">
+                Choisis une affaire à résoudre. Chaque enquête enseigne le SQL
+                étape par étape, en interrogeant de vrais registres.
+            </p>
+        </div>
+    </section>
+
+    <section class="sql-hub-list" aria-labelledby="sql-missions-title">
+        <div class="sql-hub-list-inner">
+            <div class="sql-hub-toolbar">
+                <h2 id="sql-missions-title">Affaires à résoudre</h2>
+            </div>
+
+            <div class="game-grid">
+                {% for mission in missions %}
+                {% if mission.is_playable %}
+                <a class="game-card" href="{% url 'game_mission' game.slug mission.slug %}">
+                {% else %}
+                <article class="game-card game-card--soon" aria-label="{{ mission.title }} — bientôt disponible">
+                {% endif %}
+                    <div class="game-card-media">
+                        {% with cover_path=mission.cover_image %}
+                        <img src="{% static cover_path %}" alt="Illustration {{ mission.title }}" width="640" height="400" loading="lazy">
+                        {% endwith %}
+                        {% if mission.is_playable %}
+                        <span class="game-card-badge">{{ mission.level_count }} énigmes</span>
+                        {% else %}
+                        <span class="game-card-badge game-card-badge--soon">Bientôt</span>
+                        {% endif %}
+                    </div>
+                    <div class="game-card-body">
+                        <p class="sql-mission-kicker">{{ mission.kicker }}</p>
+                        <h3>{{ mission.title }}</h3>
+                        <p>{{ mission.short_description }}</p>
+                        {% if mission.is_playable %}
+                        <span class="game-card-action">Ouvrir l'enquête →</span>
+                        {% else %}
+                        <span class="game-card-action game-card-action--soon">En préparation</span>
+                        {% endif %}
+                    </div>
+                {% if mission.is_playable %}
+                </a>
+                {% else %}
+                </article>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
