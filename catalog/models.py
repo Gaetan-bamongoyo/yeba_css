@@ -31,6 +31,10 @@ class Game(models.Model):
             from catalog.data.sql_registry import playable_mission_level_count
 
             return playable_mission_level_count()
+        if self.slug == "css":
+            from catalog.data.css_registry import playable_mission_level_count
+
+            return playable_mission_level_count()
         return self.levels.filter(is_active=True).count()
 
 

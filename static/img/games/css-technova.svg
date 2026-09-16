@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="CSS Mission TechNova">
+  <defs>
+    <linearGradient id="tnBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="55%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <pattern id="tnGrid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0V28" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="640" height="400" fill="url(#tnBg)"/>
+  <rect width="640" height="400" fill="url(#tnGrid)"/>
+  <rect x="56" y="70" width="528" height="260" rx="18" fill="rgba(248,250,252,0.08)" stroke="rgba(255,255,255,0.18)"/>
+  <rect x="84" y="98" width="472" height="36" rx="8" fill="#0F172A"/>
+  <rect x="98" y="108" width="72" height="16" rx="4" fill="#F8FAFC"/>
+  <rect x="320" y="110" width="40" height="12" rx="3" fill="#94A3B8"/>
+  <rect x="372" y="110" width="48" height="12" rx="3" fill="#94A3B8"/>
+  <rect x="432" y="110" width="48" height="12" rx="3" fill="#94A3B8"/>
+  <rect x="492" y="110" width="44" height="12" rx="3" fill="#94A3B8"/>
+  <rect x="84" y="150" width="220" height="150" rx="12" fill="rgba(255,255,255,0.92)"/>
+  <rect x="104" y="170" width="160" height="16" rx="4" fill="#0F172A"/>
+  <rect x="104" y="198" width="176" height="10" rx="3" fill="#94A3B8"/>
+  <rect x="104" y="218" width="140" height="10" rx="3" fill="#CBD5E1"/>
+  <rect x="104" y="250" width="110" height="28" rx="8" fill="#2563EB"/>
+  <rect x="324" y="150" width="232" height="150" rx="12" fill="#DBEAFE"/>
+  <circle cx="400" cy="220" r="36" fill="#2563EB" opacity="0.9"/>
+  <rect x="448" y="196" width="80" height="12" rx="4" fill="#1E3A8A"/>
+  <rect x="448" y="218" width="64" height="10" rx="3" fill="#60A5FA"/>
+  <rect x="448" y="238" width="72" height="10" rx="3" fill="#93C5FD"/>
+  <text x="72" y="360" fill="rgba(255,255,255,0.9)" font-family="Georgia, serif" font-size="22">CSS Mission - TechNova</text>
+</svg>
