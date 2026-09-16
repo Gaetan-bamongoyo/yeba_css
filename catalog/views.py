@@ -47,21 +47,46 @@ def contact(request):
         },
     )
 
+
 @require_GET
 @ensure_csrf_cookie
 def game_play(request, slug):
+    # Anciennes URLs directes → hub CSS / mission.
+    if slug == "css-flexbox":
+        return redirect("game_mission", slug="css", mission="flexbox")
+    if slug == "css-technova":
+        return redirect("game_mission", slug="css", mission="le-site-detruit")
+
     game = get_object_or_404(Game, slug=slug, is_active=True)
 
-    # SQL : d'abord la liste des enquêtes à choisir.
     if slug == "sql":
-        from catalog.data.sql_registry import SQL_MISSIONS
+        from catalog.data.sql_registry import SQL_MISSIONS, get_sql_mission_pack
+
+        missions = []
+        for meta in SQL_MISSIONS:
+            pack = get_sql_mission_pack(meta["slug"]) if meta.get("is_playable") else None
+            entry = dict(meta)
+            entry["level_count"] = pack["level_count"] if pack else 0
+            missions.append(entry)
 
         return render(
             request,
             "games/sql_hub.html",
             {
                 "game": game,
-                "missions": SQL_MISSIONS,
+                "missions": missions,
+            },
+        )
+
+    if slug == "css":
+        from catalog.data.css_registry import CSS_MISSIONS
+
+        return render(
+            request,
+            "games/css_hub.html",
+            {
+                "game": game,
+                "missions": CSS_MISSIONS,
             },
         )
 
@@ -82,52 +107,86 @@ def game_play(request, slug):
     return render(request, "games/flexbox.html", context)
 
 
-@require_GET
-@ensure_csrf_cookie
-def game_mission(request, slug, mission):
-    game = get_object_or_404(Game, slug=slug, is_active=True)
-
-    if slug != "sql":
-        return redirect("game_play", slug=slug)
-
-    from catalog.data.sql_registry import get_sql_mission_pack
-
-    pack = get_sql_mission_pack(mission)
-    if not pack:
-        messages.info(request, "Cette enquête n'existe pas encore.")
-        return redirect("game_play", slug="sql")
-
-    if not pack.get("is_playable"):
-        messages.info(request, "Cette enquête arrive bientôt.")
-        return redirect("game_play", slug="sql")
-
-    # Progression isolée par mission (localStorage) — ne pas injecter
-    # le GameProgress partagé du jeu "sql", sinon une mission pollue l'autre.
-    mission_meta = {
-        key: pack[key]
-        for key in pack
-        if key not in ("dataset", "levels")
-    }
-    empty_progress = {
+def _empty_progress():
+    return {
         "currentLevel": 0,
         "completedLevels": [],
         "isFinished": False,
         "updatedAt": None,
     }
 
-    return render(
-        request,
-        "games/sql.html",
-        {
+
+@require_GET
+@ensure_csrf_cookie
+def game_mission(request, slug, mission):
+    game = get_object_or_404(Game, slug=slug, is_active=True)
+
+    if slug == "sql":
+        from catalog.data.sql_registry import get_sql_mission_pack
+
+        pack = get_sql_mission_pack(mission)
+        if not pack:
+            messages.info(request, "Cette enquête n'existe pas encore.")
+            return redirect("game_play", slug="sql")
+
+        if not pack.get("is_playable"):
+            messages.info(request, "Cette enquête arrive bientôt.")
+            return redirect("game_play", slug="sql")
+
+        mission_meta = {
+            key: pack[key]
+            for key in pack
+            if key not in ("dataset", "levels")
+        }
+        return render(
+            request,
+            "games/sql.html",
+            {
+                "game": game,
+                "mission": mission_meta,
+                "levels_pack": pack["levels"],
+                "progress_pack": _empty_progress(),
+                "dataset_pack": pack["dataset"],
+                "sync_url": "",
+                "progress_slug": pack.get("progress_slug") or f"sql-mission-{mission}",
+            },
+        )
+
+    if slug == "css":
+        from catalog.data.css_registry import get_css_mission_pack
+
+        pack = get_css_mission_pack(mission)
+        if not pack:
+            messages.info(request, "Cette mission n'existe pas encore.")
+            return redirect("game_play", slug="css")
+
+        if not pack.get("is_playable"):
+            messages.info(request, "Cette mission arrive bientôt.")
+            return redirect("game_play", slug="css")
+
+        mission_meta = {
+            key: pack[key]
+            for key in pack
+            if key not in ("levels", "site_html", "reference_css")
+        }
+        context = {
             "game": game,
             "mission": mission_meta,
             "levels_pack": pack["levels"],
-            "progress_pack": empty_progress,
-            "dataset_pack": pack["dataset"],
+            "progress_pack": _empty_progress(),
             "sync_url": "",
-            "progress_slug": pack.get("progress_slug") or f"sql-mission-{mission}",
-        },
-    )
+            "progress_slug": pack.get("progress_slug") or f"css-mission-{mission}",
+            "hub_url": reverse("game_play", kwargs={"slug": "css"}),
+        }
+
+        if pack.get("engine") == "technova":
+            context["site_html"] = pack["site_html"]
+            context["reference_css"] = pack["reference_css"]
+            return render(request, "games/technova.html", context)
+
+        return render(request, "games/flexbox.html", context)
+
+    return redirect("game_play", slug=slug)
 
 
 @require_http_methods(["GET", "POST"])

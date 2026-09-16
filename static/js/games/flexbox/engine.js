@@ -8,11 +8,28 @@
 
     var levels = JSON.parse(document.getElementById("game-levels").textContent);
     var serverProgress = JSON.parse(document.getElementById("game-progress").textContent);
+    var progressSlug =
+        root.getAttribute("data-progress-slug") ||
+        root.dataset.progressSlug ||
+        root.getAttribute("data-game-slug") ||
+        root.dataset.gameSlug;
+    try {
+        var newKey = "nayekola:progress:" + progressSlug;
+        if (!window.localStorage.getItem(newKey)) {
+            var legacy = window.localStorage.getItem("nayekola:progress:css-flexbox");
+            if (legacy) {
+                window.localStorage.setItem(newKey, legacy);
+            }
+        }
+    } catch (error) {
+        /* ignore */
+    }
     var progressManager = window.NayekolaProgress.createProgressManager({
-        slug: root.dataset.gameSlug,
-        syncUrl: root.dataset.syncUrl,
+        slug: progressSlug,
+        syncUrl: root.getAttribute("data-sync-url") || root.dataset.syncUrl || "",
         serverProgress: serverProgress,
-        statusEl: document.getElementById("sync-status")
+        statusEl: document.getElementById("sync-status"),
+        aliasSlugs: progressSlug === "css-mission-flexbox" ? ["css-flexbox"] : []
     });
 
     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {

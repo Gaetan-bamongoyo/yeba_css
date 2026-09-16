@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ game.title }} — Le site détruit{% endblock %}
+
+{% block body_class %}page-game page-technova{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+{{ levels_pack|json_script:"game-levels" }}
+{{ progress_pack|json_script:"game-progress" }}
+{{ site_html|json_script:"technova-site-html" }}
+{{ reference_css|json_script:"technova-reference-css" }}
+
+<section class="mission-brief mission-brief--technova" aria-labelledby="mission-title">
+    <div class="mission-brief-inner">
+        <p class="mission-kicker">CSS Mission</p>
+        <h1 id="mission-title">Le site détruit</h1>
+        <p class="mission-brief-text">
+            Le CSS de TechNova a disparu. Tu as 90 minutes pour reconstruire
+            progressivement toute l’apparence du site — uniquement avec du CSS.
+        </p>
+        <div class="stability-meter" aria-label="Restauration du site">
+            <div class="stability-meter-top">
+                <span>Restauration du site</span>
+                <strong id="stability-value">0%</strong>
+            </div>
+            <div class="stability-track">
+                <div class="stability-fill" id="stability-fill"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="app-wrapper app-wrapper--technova"
+     id="game-root"
+     data-game-slug="{{ progress_slug|default:game.slug }}"
+     data-progress-slug="{{ progress_slug|default:game.slug }}"
+     data-sync-url="{{ sync_url }}">
+
+    <div class="panel technova-mission-panel">
+        <header class="panel-header">
+            <a class="icon-btn" href="{% if hub_url %}{{ hub_url }}{% else %}{% url 'home' %}{% endif %}" aria-label="Retour">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </a>
+            <h2>Brief</h2>
+            <span class="scene-tag" id="scene-tag">—</span>
+            <span class="sync-status" id="sync-status" aria-live="polite"></span>
+        </header>
+
+        <div class="game-content technova-brief">
+            <div class="level-title">Chargement…</div>
+            <div class="level-meta">
+                <span class="level-difficulty">—</span>
+                <span class="level-progress">0 / 0</span>
+            </div>
+
+            <div class="enigma-box">
+                <p class="enigma-label">Message du chef de projet</p>
+                <div class="enigma-text" id="enigma-text">…</div>
+                <button type="button" class="hint-btn" id="hint-btn">Révéler un indice</button>
+                <p class="hint-text is-hidden" id="hint-text" aria-live="polite"></p>
+            </div>
+
+            <p class="level-feedback" aria-live="polite"></p>
+
+            <div class="technova-toolbar">
+                <button type="button" class="technova-tool-btn" id="html-structure-btn">Voir le HTML</button>
+                <button type="button" class="technova-tool-btn" id="mockup-btn">Voir la maquette</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel code-editor-panel technova-editor-panel">
+        <header class="panel-header">
+            <button class="icon-btn code-icon" type="button" tabindex="-1" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+            </button>
+            <h2>Éditeur CSS</h2>
+            <div class="spacer"></div>
+        </header>
+
+        <div class="editor-content">
+            <div class="code-block">
+                <textarea id="code" placeholder="Écris le CSS qui restaure TechNova…"></textarea>
+            </div>
+            <div class="technova-actions">
+                <button class="technova-run-btn" type="button" id="run-preview-btn" title="Afficher le rendu (Ctrl+Entrée)">
+                    EXÉCUTER
+                </button>
+                <button class="validate-btn" type="button" id="check-btn">VALIDER LA MISSION</button>
+            </div>
+            <p class="technova-editor-hint">
+                Les sélecteurs HTML sont proposés en tapant. <strong>Exécuter</strong> ouvre l’aperçu.
+                Le CSS reste cumulatif entre les missions.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="technova-preview-modal is-hidden" id="html-modal" role="dialog" aria-modal="true" aria-labelledby="html-modal-title" hidden>
+    <div class="technova-preview-modal-backdrop" data-html-close></div>
+    <div class="technova-preview-modal-card technova-html-modal-card">
+        <header class="technova-preview-modal-header">
+            <div>
+                <p class="technova-preview-modal-kicker">Lecture seule</p>
+                <h2 id="html-modal-title">Structure HTML du site</h2>
+            </div>
+            <button type="button" class="technova-preview-close" data-html-close aria-label="Fermer">×</button>
+        </header>
+        <p class="technova-html-note technova-html-note--modal">
+            Tu ne modifies pas le HTML. Utilise ces balises, classes et id dans ton CSS.
+        </p>
+        <pre class="technova-html-code" id="technova-html-view" tabindex="0"></pre>
+    </div>
+</div>
+
+<div class="technova-preview-modal is-hidden" id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title" hidden>
+    <div class="technova-preview-modal-backdrop" data-preview-close></div>
+    <div class="technova-preview-modal-card">
+        <header class="technova-preview-modal-header">
+            <div>
+                <p class="technova-preview-modal-kicker" id="preview-mode-label">Ton rendu</p>
+                <h2 id="preview-modal-title">Aperçu du site</h2>
+            </div>
+            <div class="technova-preview-modal-tools">
+                <div class="technova-viewport-btns" role="group" aria-label="Largeur d’aperçu">
+                    <button type="button" class="technova-vp-btn is-active" data-preview-width="100%">Desktop</button>
+                    <button type="button" class="technova-vp-btn" data-preview-width="768">Tablette</button>
+                    <button type="button" class="technova-vp-btn" data-preview-width="390">Mobile</button>
+                </div>
+                <button type="button" class="technova-preview-close" data-preview-close aria-label="Fermer l’aperçu">×</button>
+            </div>
+        </header>
+        <div class="technova-preview-frame-wrap">
+            <iframe id="technova-preview" class="technova-preview-frame" title="Aperçu du site TechNova"></iframe>
+        </div>
+        <p class="technova-preview-modal-note">
+            Ferme la fenêtre pour continuer à coder, puis ré-exécute pour rafraîchir le rendu.
+        </p>
+    </div>
+</div>
+
+<div class="victory-modal is-hidden" id="victory-modal" role="dialog" aria-modal="true" aria-labelledby="victory-title" hidden>
+    <div class="victory-modal-backdrop" data-victory-close></div>
+    <div class="victory-modal-card">
+        <p class="victory-kicker">🎉 Mission accomplie</p>
+        <h2 id="victory-title">CSS Mission terminée</h2>
+        <p class="victory-text">
+            Le site TechNova a été restauré avec succès.
+            Le client peut maintenant effectuer sa présentation.
+        </p>
+        <div class="technova-before-after" aria-hidden="true">
+            <div>
+                <span>Avant</span>
+                <p>HTML brut, sans CSS</p>
+            </div>
+            <div class="technova-before-after-arrow">→</div>
+            <div>
+                <span>Après</span>
+                <p>Site professionnel restauré</p>
+            </div>
+        </div>
+        <div class="victory-actions">
+            <a class="victory-btn victory-btn--primary" href="{% if hub_url %}{{ hub_url }}{% else %}{% url 'home' %}{% endif %}">
+                {% if hub_url %}Autres missions CSS{% else %}Retour au menu{% endif %}
+            </a>
+            <button type="button" class="victory-btn victory-btn--ghost" id="victory-restart">Rejouer la mission</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/css-hint.min.js"></script>
+<script src="{% static 'js/games/flexbox/progress.js' %}?v=flexbox-progress6"></script>
+<script src="{% static 'js/games/technova/engine.js' %}?v=technova-engine6"></script>
+{% endblock %}

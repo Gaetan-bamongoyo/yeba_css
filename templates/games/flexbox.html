@@ -38,11 +38,12 @@
 
 <div class="app-wrapper app-wrapper--enigma"
      id="game-root"
-     data-game-slug="{{ game.slug }}"
+     data-game-slug="{{ progress_slug|default:game.slug }}"
+     data-progress-slug="{{ progress_slug|default:game.slug }}"
      data-sync-url="{{ sync_url }}">
     <div class="panel game-view-panel">
         <header class="panel-header">
-            <a class="icon-btn" href="{% url 'home' %}" aria-label="Retour à l'accueil">
+            <a class="icon-btn" href="{% if hub_url %}{{ hub_url }}{% else %}{% url 'home' %}{% endif %}" aria-label="Retour">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15 18 9 12 15 6"></polyline>
@@ -114,11 +115,13 @@
             Que veux-tu faire maintenant ?
         </p>
         <div class="victory-actions">
-            <a class="victory-btn victory-btn--primary" href="{% url 'home' %}">Retour au menu</a>
+            <a class="victory-btn victory-btn--primary" href="{% if hub_url %}{{ hub_url }}{% else %}{% url 'home' %}{% endif %}">
+                {% if hub_url %}Autres missions CSS{% else %}Retour au menu{% endif %}
+            </a>
             <a class="victory-btn victory-btn--secondary" href="{% url 'home' %}#situations">Voir les autres jeux</a>
             <button type="button" class="victory-btn victory-btn--ghost" id="victory-restart">Rejouer ce protocole</button>
         </div>
-        <p class="victory-note">Python et SQL arrivent bientôt — reste connecté.</p>
+        <p class="victory-note">Continue avec une autre mission CSS ou explore SQL.</p>
     </div>
 </div>
 {% endblock %}
@@ -129,5 +132,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/css-hint.min.js"></script>
 <script src="{% static 'js/games/flexbox/progress.js' %}?v=flexbox-progress6"></script>
-<script src="{% static 'js/games/flexbox/engine.js' %}?v=flexbox-engine6"></script>
+<script src="{% static 'js/games/flexbox/engine.js' %}?v=flexbox-engine7"></script>
 {% endblock %}

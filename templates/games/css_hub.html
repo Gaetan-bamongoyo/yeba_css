@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Missions CSS — {{ game.title }}{% endblock %}
+
+{% block body_class %}page-game page-css page-css-hub{% endblock %}
+
+{% block content %}
+<main class="sql-hub css-hub">
+    <section class="mission-brief mission-brief--technova" aria-labelledby="css-hub-title">
+        <div class="mission-brief-inner">
+            <p class="mission-kicker">Atelier CSS</p>
+            <h1 id="css-hub-title">Missions CSS</h1>
+            <p class="mission-brief-text">
+                Choisis une mission. Chaque parcours t’apprend le CSS
+                en reconstruisant une vraie interface, étape par étape.
+            </p>
+        </div>
+    </section>
+
+    <section class="sql-hub-list" aria-labelledby="css-missions-title">
+        <div class="sql-hub-list-inner">
+            <div class="sql-hub-toolbar">
+                <h2 id="css-missions-title">Missions disponibles</h2>
+            </div>
+
+            <div class="game-grid">
+                {% for mission in missions %}
+                {% if mission.is_playable %}
+                <a class="game-card" href="{% url 'game_mission' game.slug mission.slug %}">
+                {% else %}
+                <article class="game-card game-card--soon" aria-label="{{ mission.title }} — bientôt disponible">
+                {% endif %}
+                    <div class="game-card-media">
+                        {% with cover_path=mission.cover_image %}
+                        <img src="{% static cover_path %}" alt="Illustration {{ mission.title }}" width="640" height="400" loading="lazy">
+                        {% endwith %}
+                        {% if mission.is_playable %}
+                        <span class="game-card-badge">{{ mission.level_count }} niveaux</span>
+                        {% else %}
+                        <span class="game-card-badge game-card-badge--soon">Bientôt</span>
+                        {% endif %}
+                    </div>
+                    <div class="game-card-body">
+                        <p class="sql-mission-kicker">{{ mission.kicker }}</p>
+                        <h3>{{ mission.title }}</h3>
+                        <p>{{ mission.short_description }}</p>
+                        {% if mission.is_playable %}
+                        <span class="game-card-action">Ouvrir la mission →</span>
+                        {% else %}
+                        <span class="game-card-action game-card-action--soon">En préparation</span>
+                        {% endif %}
+                    </div>
+                {% if mission.is_playable %}
+                </a>
+                {% else %}
+                </article>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
