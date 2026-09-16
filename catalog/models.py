@@ -27,6 +27,10 @@ class Game(models.Model):
         return f"img/games/{self.slug}.svg"
 
     def level_count(self):
+        if self.slug == "sql":
+            from catalog.data.sql_registry import playable_mission_level_count
+
+            return playable_mission_level_count()
         return self.levels.filter(is_active=True).count()
 
 

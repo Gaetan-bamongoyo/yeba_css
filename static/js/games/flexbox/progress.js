@@ -17,6 +17,15 @@
         return "";
     }
 
+    function emptyProgress() {
+        return {
+            currentLevel: 0,
+            completedLevels: [],
+            isFinished: false,
+            updatedAt: null
+        };
+    }
+
     function readLocal(slug) {
         try {
             var raw = window.localStorage.getItem(storageKey(slug));
@@ -28,28 +37,46 @@
 
     function writeLocal(slug, progress) {
         var payload = {
-            currentLevel: progress.currentLevel || 0,
-            completedLevels: progress.completedLevels || [],
-            isFinished: !!progress.isFinished,
+            currentLevel: Number(progress.currentLevel) || 0,
+            completedLevels: Array.isArray(progress.completedLevels)
+                ? progress.completedLevels
+                : [],
+            isFinished: progress.isFinished === true,
             updatedAt: new Date().toISOString()
         };
         window.localStorage.setItem(storageKey(slug), JSON.stringify(payload));
         return payload;
     }
 
+    function removeLocal(slug) {
+        try {
+            window.localStorage.removeItem(storageKey(slug));
+        } catch (error) {
+            /* ignore */
+        }
+    }
+
     function mergeProgress(localProgress, serverProgress) {
-        var local = localProgress || {
-            currentLevel: 0,
-            completedLevels: [],
-            isFinished: false,
-            updatedAt: null
-        };
-        var server = serverProgress || {
-            currentLevel: 0,
-            completedLevels: [],
-            isFinished: false,
-            updatedAt: null
-        };
+        var local = localProgress || emptyProgress();
+        var server = serverProgress || emptyProgress();
+        var localTime = local.updatedAt ? Date.parse(local.updatedAt) : 0;
+        var serverTime = server.updatedAt ? Date.parse(server.updatedAt) : 0;
+
+        // Si le local est un reset plus récent, ne pas réimporter un "terminé" serveur.
+        if (
+            localTime &&
+            local.isFinished === false &&
+            (local.completedLevels || []).length === 0 &&
+            (local.currentLevel || 0) === 0 &&
+            localTime >= serverTime
+        ) {
+            return {
+                currentLevel: 0,
+                completedLevels: [],
+                isFinished: false,
+                updatedAt: local.updatedAt
+            };
+        }
 
         var completed = [];
         (local.completedLevels || []).concat(server.completedLevels || []).forEach(function (index) {
@@ -71,10 +98,21 @@
 
     function createProgressManager(options) {
         var slug = options.slug;
-        var syncUrl = options.syncUrl;
+        var syncUrl = options.syncUrl || "";
         var statusEl = options.statusEl;
-        var state = mergeProgress(readLocal(slug), options.serverProgress);
-        writeLocal(slug, state);
+        var aliasSlugs = options.aliasSlugs || [];
+        var local = readLocal(slug);
+        var state;
+
+        if (!syncUrl) {
+            state = local || emptyProgress();
+            if (!local) {
+                writeLocal(slug, state);
+            }
+        } else {
+            state = mergeProgress(local, options.serverProgress);
+            writeLocal(slug, state);
+        }
 
         var syncTimer = null;
         var syncing = false;
@@ -95,20 +133,52 @@
             return state;
         }
 
+        function reset() {
+            var i;
+            removeLocal(slug);
+            for (i = 0; i < aliasSlugs.length; i++) {
+                removeLocal(aliasSlugs[i]);
+            }
+            state = writeLocal(slug, emptyProgress());
+            if (syncTimer) {
+                window.clearTimeout(syncTimer);
+                syncTimer = null;
+            }
+            return state;
+        }
+
         function scheduleSync() {
+            if (!syncUrl) {
+                return;
+            }
             if (syncTimer) {
                 window.clearTimeout(syncTimer);
             }
-            syncTimer = window.setTimeout(syncNow, 1200);
+            syncTimer = window.setTimeout(function () {
+                syncNow();
+            }, 1200);
         }
 
-        function syncNow() {
-            if (!syncUrl || syncing || !window.navigator.onLine) {
+        function syncNow(extraPayload, callback) {
+            var done = typeof callback === "function" ? callback : function () {};
+            var body;
+
+            if (!syncUrl) {
+                done(state);
+                return;
+            }
+            if (syncing) {
+                done(state);
+                return;
+            }
+            if (!window.navigator.onLine) {
+                done(state);
                 return;
             }
 
             syncing = true;
             setStatus("Sync…");
+            body = Object.assign({}, state, extraPayload || {});
 
             fetch(syncUrl, {
                 method: "POST",
@@ -117,7 +187,7 @@
                     "Content-Type": "application/json",
                     "X-CSRFToken": getCookie("csrftoken")
                 },
-                body: JSON.stringify(state)
+                body: JSON.stringify(body)
             })
                 .then(function (response) {
                     if (!response.ok) {
@@ -126,15 +196,21 @@
                     return response.json();
                 })
                 .then(function (serverState) {
-                    state = mergeProgress(state, serverState);
-                    writeLocal(slug, state);
+                    if (extraPayload && extraPayload.reset) {
+                        state = writeLocal(slug, emptyProgress());
+                    } else {
+                        state = mergeProgress(state, serverState);
+                        writeLocal(slug, state);
+                    }
                     setStatus("Sauvé");
                     window.setTimeout(function () {
                         setStatus("");
                     }, 1500);
+                    done(state);
                 })
                 .catch(function () {
                     setStatus("Hors ligne");
+                    done(state);
                 })
                 .finally(function () {
                     syncing = false;
@@ -147,11 +223,14 @@
             }
         });
 
-        window.addEventListener("online", syncNow);
+        window.addEventListener("online", function () {
+            syncNow();
+        });
 
         return {
             getState: getState,
             save: save,
+            reset: reset,
             syncNow: syncNow
         };
     }

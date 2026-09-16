@@ -568,12 +568,21 @@
         hideVictoryModal();
         currentLevel = 0;
         hasFinishedGame = false;
-        progressManager.save({
-            currentLevel: 0,
-            completedLevels: [],
-            isFinished: false
+
+        if (typeof progressManager.reset === "function") {
+            progressManager.reset();
+        } else {
+            progressManager.save({
+                currentLevel: 0,
+                completedLevels: [],
+                isFinished: false
+            });
+        }
+
+        // Force le serveur à oublier l'ancien état "terminé", puis recharge.
+        progressManager.syncNow({ reset: true }, function () {
+            window.location.reload();
         });
-        loadLevel(currentLevel);
     }
 
     function handleValidateClick() {
